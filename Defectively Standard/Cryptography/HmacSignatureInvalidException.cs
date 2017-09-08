@@ -2,7 +2,7 @@
 
 namespace Defectively.Standard.Cryptography
 {
-    /// <inheritdoc cref="Exception"/>
+    /// <inheritdoc />
     public class HmacSignatureInvalidException : Exception
     {
     }

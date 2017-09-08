@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -42,6 +43,19 @@ namespace Defectively.Standard.Networking
             clients.Clear();
             client.Dispose();
         }
+        
+        private void OnClientDisconnected(ConnectableBase sender, DisconnectedEventArgs e) {
+            e.Client.Disconnected -= OnClientDisconnected;
+            OnDisconnected(this, e);
+        }
+
+        /// <summary>
+        ///     Removes all the <see cref="Client"/>s that match the conditions defined by the specified predicate.
+        /// </summary>
+        /// <param name="predicate">The <see cref="Predicate{T}"/> delegate that defines the conditions of the <see cref="Client"/>s to remove.</param>
+        public void RemoveAllClients(Predicate<Client> predicate) {
+            clients.RemoveAll(predicate);
+        }
 
         /// <summary>
         ///     Starts the <see cref="Server"/> asynchronously and waits for incoming connections.
@@ -63,6 +77,7 @@ namespace Defectively.Standard.Networking
                 client = await listener.AcceptTcpClientAsync();
 
                 var connectedClient = new Client(client);
+                connectedClient.Disconnected += OnClientDisconnected;
                 if (secure) {
                     await connectedClient.WriteAsync(publicRSAParams);
                     var decrypted = CryptographyProvider.Instance.RSADecrypt(await connectedClient.ReadRawAsync(), privateRSAParams);

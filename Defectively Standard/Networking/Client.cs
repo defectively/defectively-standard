@@ -74,6 +74,7 @@ namespace Defectively.Standard.Networking
         /// </summary>
         /// <returns>Returns a <see cref="Task"/> that represents the asynchronous read operation. The value of the TResult parameter contains the next line from the stream.</returns>
         /// <remarks>The returned string will be decrypted if the <see cref="Client"/> has valid <see cref="CryptographicData"/> and the data seems encrypted (contains a "|").<para>Use the <see cref="ReadRawAsync"/> function to always get unhandled data.</para></remarks>
+        /// <exception cref="ClientDisconnectedException">The <see cref="Client"/> isn't connected.</exception>
         /// <exception cref="HmacSignatureInvalidException">The signature is invalid or the data isn't encrypted but contains a "|".</exception>
         public async Task<string> ReadAsync() {
             if (CryptographicData == null || !CryptographicData.IsValid()) {
@@ -101,6 +102,7 @@ namespace Defectively.Standard.Networking
         /// <typeparam name="TOut">The type of the expected object.</typeparam>
         /// <returns>Returns a <see cref="Task"/> that represents the asynchronous read operation. The value of the TResult parameter contains the deserialized object.</returns>
         /// <remarks>This function uses the <see cref="ReadAsync"/> function.<para>If the serialized data isn't encrypted but may contain a "|" use the <see cref="ReadRawAsync"/> function and deserialize the data manually.</para></remarks>
+        /// <exception cref="ClientDisconnectedException">The <see cref="Client"/> isn't connected.</exception>
         /// <exception cref="JsonSerializationException">The data read isn't valid Json or does not represent a <typeparamref name="TOut"/> object.</exception>
         public async Task<TOut> ReadAsync<TOut>() {
             var serialized = await ReadAsync();
@@ -111,8 +113,14 @@ namespace Defectively.Standard.Networking
         ///     Reads a line of characters asynchronously from the stream and returns the data always unhandled.
         /// </summary>
         /// <returns>Returns a <see cref="Task"/> that represents the asynchronous read operation. The value of the TResult parameter contains the next line from the stream.</returns>
+        /// <exception cref="ClientDisconnectedException">The <see cref="Client"/> isn't connected.</exception>
         public async Task<string> ReadRawAsync() {
-            return await reader.ReadLineAsync();
+            var data = await reader.ReadLineAsync();
+            if (data == null) {
+                OnDisconnected(this, new DisconnectedEventArgs(this));
+                throw new ClientDisconnectedException(new DisconnectedEventArgs(this));
+            }
+            return data;
         }
 
         /// <summary>

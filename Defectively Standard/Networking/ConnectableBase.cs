@@ -21,7 +21,15 @@ namespace Defectively.Standard.Networking
         ///     Occurs when a <see cref="Client"/> connects to a <see cref="Server"/>.
         /// </summary>
         public event ConnectedEventHandler Connected;
-        
+
+        /// <inheritdoc />
+        public delegate void DisconnectedEventHandler(ConnectableBase sender, DisconnectedEventArgs e);
+
+        /// <summary>
+        ///     Occurs when a <see cref="Client"/> disconnects.
+        /// </summary>
+        public event DisconnectedEventHandler Disconnected;
+
         /// <summary>
         ///     Raises the <see cref="Connected"/> event
         /// </summary>
@@ -29,6 +37,15 @@ namespace Defectively.Standard.Networking
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
         protected virtual void OnConnected(ConnectableBase sender, ConnectedEventArgs e) {
             Connected?.Invoke(sender, e);
+        }
+
+        /// <summary>
+        ///     Raises the <see cref="Disconnected"/> event
+        /// </summary>
+        /// <param name="sender">The <see cref="ConnectableBase"/> raising this event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        protected virtual void OnDisconnected(ConnectableBase sender, DisconnectedEventArgs e) {
+            Disconnected?.Invoke(sender, e);
         }
     }
 }
