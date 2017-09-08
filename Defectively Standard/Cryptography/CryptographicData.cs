@@ -39,7 +39,7 @@ namespace Defectively.Standard.Cryptography
         /// <summary>
         ///     Validates if all values of the <see cref="CryptographicData"/> are set.
         /// </summary>
-        /// <returns>Returns "true" if the <see cref="CryptographicData"/> has all values set otherwise "false".</returns>
+        /// <returns>Returns "true" if the <see cref="CryptographicData"/> has all values set, otherwise "false".</returns>
         public bool IsValid() => AesKey != null && AesKey.Length != 0 && AesIV != null && AesIV.Length != 0 && HmacKey != null && HmacKey.Length != 0;
     }
 }
