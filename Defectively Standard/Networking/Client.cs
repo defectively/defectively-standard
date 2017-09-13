@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -18,6 +19,11 @@ namespace Defectively.Standard.Networking
         /// </summary>
         /// <exception cref="SocketException"><see cref="Client"/> is not connected.</exception>
         public IPAddress Address => IPAddress.Parse(((IPEndPoint) client.Client.RemoteEndPoint).Address.ToString());
+
+        /// <summary>
+        ///     The identifier of the connection of this <see cref="Client"/>. Gets generated and set by the <see cref="Server"/>.
+        /// </summary>
+        public Guid SessionId { get; set; }
 
         private readonly TcpClient client;
         private StreamReader reader;
@@ -56,6 +62,7 @@ namespace Defectively.Standard.Networking
                 var @params = await ReadAsync<RSAParameters>();
                 var encrypted = CryptographyProvider.Instance.RSAEncrypt(JsonConvert.SerializeObject(CryptographicData), @params);
                 await WriteRawAsync(encrypted);
+                SessionId = Guid.Parse(await ReadAsync());
             }
             OnConnected(this, new ConnectedEventArgs());
         }

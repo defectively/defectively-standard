@@ -63,7 +63,7 @@ namespace Defectively.Standard.Networking
         /// <param name="secure">Set to "true" to use <see cref="Aes"/> encryption for all communications.</param>
         /// <remarks>Using <paramref name="secure" /> requires each connecting client <see cref="Client"/> to have valid <see cref="CryptographicData"/> set.</remarks>
         /// <returns>Returns a <see cref="Task"/> that represents the asynchronous start operation.</returns>
-        public async Task Start(bool secure) {
+        public async Task StartAsync(bool secure) {
             listener.Start();
 
             if (secure) {
@@ -82,6 +82,9 @@ namespace Defectively.Standard.Networking
                     await connectedClient.WriteAsync(publicRSAParams);
                     var decrypted = CryptographyProvider.Instance.RSADecrypt(await connectedClient.ReadRawAsync(), privateRSAParams);
                     connectedClient.CryptographicData = JsonConvert.DeserializeObject<CryptographicData>(decrypted);
+                    var sessionId = new Guid();
+                    connectedClient.SessionId = sessionId;
+                    await connectedClient.WriteAsync(sessionId.ToString());
                 }
                 clients.Add(connectedClient);
 
