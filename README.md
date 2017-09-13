@@ -15,7 +15,7 @@ private Server server;
 private async void OnStartServerClick(object sender, EventArgs e) {
     server = new Server(port);
     server.Connected += OnServerConnected;
-    await server.Start(true); // set to false if you don't wish to use AES encryption
+    await server.StartAsync(true); // set to false if you don't wish to use AES encryption
 }
 
 private async void OnServerConnected(ConnectableBase sender, ConnectedEventArgs e) {
