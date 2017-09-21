@@ -82,7 +82,7 @@ namespace Defectively.Standard.Networking
                     await connectedClient.WriteAsync(publicRSAParams);
                     var decrypted = CryptographyProvider.Instance.RSADecrypt(await connectedClient.ReadRawAsync(), privateRSAParams);
                     connectedClient.CryptographicData = JsonConvert.DeserializeObject<CryptographicData>(decrypted);
-                    var sessionId = new Guid();
+                    var sessionId = Guid.NewGuid();
                     connectedClient.SessionId = sessionId;
                     await connectedClient.WriteAsync(sessionId.ToString());
                 }
